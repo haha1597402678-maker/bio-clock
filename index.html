@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aven 生物钟</title>
+<style>
+body{background:#0e0e10;color:#e4e4e7;font-family:system-ui;padding:32px}
+h1{color:#f4f4f5;font-size:26px}
+.sub{color:#52525b;font-size:14px}
+.ctrl{display:flex;gap:16px;align-items:center;margin-bottom:24px}
+#t{font-size:20px;color:#a1a1aa}
+#b{background:transparent;border:1px solid #3f3f46;color:#a1a1aa;padding:8px 16px;border-radius:8px;cursor:pointer}
+.grp{margin-bottom:12px}
+.h{display:flex;justify-content:space-between;font-size:14px;margin-bottom:3px}
+.n{font-weight:600}
+.v{color:#d4d4d8}
+ar{font-size:12px;margin-left:5px}
+.au{color:#4ade80}
+.ad{color:#ef4444}
+.af{color:#52525b}
+.tk{background:#27272a;height:7px;border-radius:4px;position:relative}
+.fl{height:7px;border-radius:4px;transition:width 1s}
+.dt{position:absolute;top:-2px;width:4px;height:11px;background:#f4f4f5;border-radius:1px;transition:left 1s}
+.nt{font-size:12px;color:#52525b;margin-top:4px}
+.ft{font-size:12px;color:#3f3f46;margin-top:24px;padding-top:12px;border-top:1px solid #27272a}
+</style>
+</head>
+<body>
+<h1>Aven 生物钟</h1>
+<div class="sub">余弦偏置 · 动展示层 · 绝不写回 base</div>
+<div class="ctrl"><span id="t">--:--</span><button id="b">偏置中</button></div>
+<div id="l"></div>
+<div class="ft">CAP=0.08 | 被时辰推高 | 被时辰压低 | 持平</div>
+<script>
+var C=0.08,O=true
+var D=[
+{id:'依恋',p:22,a:0.5,c:'#f472b6'},
+{id:'好奇',p:10,a:1.0,c:'#60a5fa'},
+{id:'回味',p:23,a:0.9,c:'#fbbf24'},
+{id:'责任',p:14,a:0.7,c:'#f87171'},
+{id:'安逸',p:19,a:0.3,c:'#34d399'},
+{id:'疲惫',p:0,a:1.2,c:'#818cf8'},
+{id:'独处',p:2,a:1.1,c:'#a78bfa'},
+{id:'压力',p:16,a:0.6,c:'#e879f9'}
+]
+function f(d,h){return C*d.a*Math.cos(2*Math.PI*(h-d.p)/24)}
+function r(){
+var n=new Date(),h=n.getHours()+n.getMinutes()/60
+var s='',h2=n.getHours(),m2=n.getMinutes()
+if(h2<10){h2='0'+h2}
+if(m2<10){m2='0'+m2}
+document.getElementById('t').textContent=h2+':'+m2
+var html=''
+for(var i=0;i<D.length;i++){
+var d=D[i]
+var dr=O?f(d,h):0
+var b=0.5+0.3*Math.sin(h/24*2*Math.PI+i*0.2)
+if(b<0.05){b=0.05}
+if(b>1){b=1}
+var dp=b+dr
+if(dp<0.05){dp=0.05}
+if(dp>1){dp=1}
+var a='→',x='af'
+if(dp>b+0.01){a='▲',x='au'}
+else if(dp<b-0.01){a='▼',x='ad'}
+html=html+'<div class="grp"><div class="h"><span class="n" style="color:"'+d.c+'">'+d.id+'</span><span class="v">'+(dp*100).toFixed(1)+' <span class="ar '+x+'">'+a+'</span></span></div><div class="tk"><div class="fl" style="width:'+(b*100)+'%;background:'+d.c+'"></div><div class="dt" style="left:calc('+(dp*100)+'% - 2px)"></div></div><div class="nt">峰值 '+d.p+':00 | 基础 '+(b*100).toFixed(1)+'%</div></div>'
+}
+document.getElementById('l').innerHTML=html
+}
+document.getElementById('b').onclick=function(){O=!O;r()}
+r()
+setInterval(r,10000)
+</script>
+</body>
+</html>
